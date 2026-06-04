@@ -15,13 +15,13 @@ DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device("cp
 print("DEVICE:", DEVICE)
 
 DEFAULT_MSITF_CKPT = os.getenv("MSITF_CKPT_PATH")
-
+DEFAULT_MODEL_CKPT = os.getenv("MODEL_CKPT_PATH")
 # ============= helper functions ================================================
 def load_model(model_name='normwear'):
     # all models should follows the function structure of AST_API
     if model_name == 'normwear':
         # model = NormWearZeroShot() # random init
-        model = NormWearZeroShot(msitf_ckpt=DEFAULT_MSITF_CKPT)
+        model = NormWearZeroShot(msitf_ckpt=DEFAULT_MSITF_CKPT, weight_path=DEFAULT_MODEL_CKPT)
     # elif model_name == 'clap':
     #     model = CLAP_API()
     else:
