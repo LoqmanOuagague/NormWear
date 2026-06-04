@@ -62,7 +62,7 @@ TINYLLAMA_PATH=path/example
 - Launches zero-shot inference with:
 
 ```sh
-CUDA_VISIBLE_DEVICES=0 python3 -m NormWear.zero_shot.zero_shot_inference normwear --dataset wesad
+CUDA_VISIBLE_DEVICES=0 python3 -m NormWear.zero_shot.zero_shot_inference normwear --dataset wesad --times 3
 ```
 
 Before submitting, update the module names, environment name, repository path, and Slurm account values to match your cluster. Then run:

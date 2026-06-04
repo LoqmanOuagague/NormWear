@@ -195,14 +195,9 @@ def zs_inference(
             y_probs,
             roc_save_path,
         )
-        print("Threshold metrics:", threshold_metrics)
-        with open(os.path.join(dataset_root, f"{ds_name.replace('/', '_')}_{k}_threshold_metrics.json"), 'w') as f:
-            json.dump(threshold_metrics, f, indent=4)
-        print("Evaluation scores on {}:".format(ds_name, k))
         scores = [round(s*100, 3) for s in scores]
-        with open(os.path.join(dataset_root, f"{ds_name.replace('/', '_')}_{k}_scores.json"), 'w') as f:
-            json.dump(scores, f, indent=4)
-        print(scores)
+        return threshold_metrics, scores
+        
 
 def zs_evaluate(
     sensor_embeds=None,
@@ -244,6 +239,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('model_name', nargs='?', default='normwear')
     parser.add_argument('--dataset', default='all', help='Run only one dataset, e.g. wesad')
+    parser.add_argument('--times', default='1', help='for how many times to run the evaluation, default 1')
     args = parser.parse_args()
 
     model_name = args.model_name
@@ -286,10 +282,16 @@ if __name__ == '__main__':
     for ds in ds_names:
         print(ds)
         ds_name, task_idx = ds
-
-        zs_inference(
-            ds_name=ds_name, 
-            model_name=model_name, 
-            task_idx=task_idx,
-            batch_size=8
-        )
+        eval_metrics, scores= [], []
+        for t in tqdm(range(int(args.times)), desc=f"Processing {ds_name}"):
+            print(f"Run {t+1}/{args.times} for {ds_name}...")
+            eval, score = zs_inference(
+                ds_name=ds_name, 
+                model_name=model_name, 
+                task_idx=task_idx,
+                batch_size=8
+            )
+            eval_metrics.append(eval)
+            scores.append(score)
+        print(f"Final evaluation metrics for {ds_name}:", scores)
+        print(f"Final evaluation metrics for {ds_name}:", eval_metrics)
