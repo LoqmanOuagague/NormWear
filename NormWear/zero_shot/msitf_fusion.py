@@ -9,7 +9,7 @@ from ..main_model import *
 from .sentence_template import *
 
 load_dotenv()
-def _resolve_tinyllama_path():
+def resolve_tinyllama_path():
     env_path = os.getenv("TINYLLAMA_PATH")
     if env_path:
         return os.path.abspath(os.path.expanduser(env_path))
@@ -232,7 +232,7 @@ class NormWearZeroShot(nn.Module):
         self.rel_only = rel_only
 
         # text encoder
-        tinyllama_path = _resolve_tinyllama_path()
+        tinyllama_path = resolve_tinyllama_path()
         self.tokenizer = AutoTokenizer.from_pretrained(tinyllama_path)
         self.nlp_model = freeze_model(AutoModelForCausalLM.from_pretrained(tinyllama_path))
         self.query_size = 2048
