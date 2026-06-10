@@ -32,8 +32,20 @@ pip install -r requirements.txt
 ## Download model weights
 
 The pretrained NormWear  and the zero-shot MSiTF fusion checkpoints are available from the [GitHub release of the original repo](https://github.com/Mobile-Sensing-and-UbiComp-Laboratory/NormWear/releases/tag/v1.0.0-alpha). After downloading the MSiTF checkpoint make sure to update `MSITF_CKPT_PATH` in the `.env` file to point at the checkpoint file.
-
-
+In case you want to use the model from HuggingFace, First download it localy
+```sh
+hf download mosaic-laboratory/normwear
+```
+**Note**:
+* To use the weights from the github checkpoints use [zero_shot_inference.py](NormWear/zero_shot/zero_shot_inference.py) and to use the hugging face model use [zero_shot_inference_HF.py](NormWear/zero_shot/zero_shot_inference_HF.py); Both the files are the same the only difference is that one use the NormWearZeroShot class and the other one use NormWearZeroShotHF (both classes are provided in [msitf_fusio.py](NormWear/zero_shot/msitf_fusion.py))
+* In case you want to costumize the directory of the model use this commend: 
+```sh
+hf download mosaic-laboratory/normwear --local-dir YOUR_DIRECTORY
+```
+and set the variable in the [.env](.env) file
+```sh
+NORMWEAR_PATH=YOUR_DIRECTORY
+```
 ## Download datasets
 
 ### Downstream datasets
@@ -46,11 +58,18 @@ The pretraining dataset archive can be downloaded from [Google Drive](https://dr
 
 ## TinyLlama path in `.env`
 
-The zero-shot code loads  [muzammil-eds/tinyllama-2.5T-Clinical-v2](https://huggingface.co/muzammil-eds/tinyllama-2.5T-Clinical-v2) from HuggingFace by default. 
-In case, the HPC does not allow requests to HuggingFace you can download the model then set the `TINYLLAMA_PATH` environment variable (in the `.env` file) to be the path of the downloaded model. 
-
+The zero-shot code loads  [muzammil-eds/tinyllama-2.5T-Clinical-v2](https://huggingface.co/muzammil-eds/tinyllama-2.5T-Clinical-v2) localy. 
+You can download the model localy by using: 
 ```sh
-TINYLLAMA_PATH=path/example
+hf download muzammil-eds/tinyllama-2.5T-Clinical-v2
+```
+**Note**: In case you want to costumize the directory of the model use this commend:
+```sh
+hf download muzammil-eds/tinyllama-2.5T-Clinical-v2 --local-dir YOUR_DIRECTORY
+```
+and set the variable in the [.env](.env) file
+```sh
+TINYLLAMA_PATH=YOUR_DIRECTORY
 ```
 
 ## HPC job script
