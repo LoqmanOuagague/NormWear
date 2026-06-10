@@ -457,6 +457,7 @@ name = "normwear"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "huggingface-hub" },
     { name = "joblib" },
     { name = "multiprocess" },
     { name = "pandas" },
@@ -473,6 +474,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "huggingface-hub", specifier = ">=1.15.0" },
     { name = "joblib", specifier = ">=1.5.3" },
     { name = "multiprocess", specifier = ">=0.70.19" },
     { name = "pandas", specifier = ">=3.0.3" },

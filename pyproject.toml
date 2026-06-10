@@ -3,6 +3,7 @@ name = "normwear"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
+    "huggingface-hub>=1.15.0",
     "joblib>=1.5.3",
     "multiprocess>=0.70.19",
     "pandas>=3.0.3",

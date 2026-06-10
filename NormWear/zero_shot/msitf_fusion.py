@@ -233,7 +233,7 @@ class NormWearZeroShot(nn.Module):
 
         # text encoder
         tinyllama_path = resolve_tinyllama_path()
-        self.tokenizer = AutoTokenizer.from_pretrained(tinyllama_path)
+        self.tokenizer = AutoTokenizer.from_pretrained(tinyllama_path,trust_remote_code=True,local_files_only=True)
         self.nlp_model = freeze_model(AutoModelForCausalLM.from_pretrained(tinyllama_path))
         self.query_size = 2048
 
@@ -347,3 +347,76 @@ class NormWearZeroShot(nn.Module):
         loss = self.loss_f(sensor_embed, gt)
 
         return loss
+
+class NormWearZeroShotHF(NormWearZeroShot):
+    def __init__(
+            self, 
+            use_query=True,
+            rel_only=False,
+            hf_model_id="mosaic-laboratory/normwear"
+        ):
+        nn.Module.__init__(self)
+        self.use_query = use_query
+        self.rel_only = rel_only
+        tinyllama_path = resolve_tinyllama_path()
+        self.tokenizer = AutoTokenizer.from_pretrained(tinyllama_path)
+        self.nlp_model = freeze_model(AutoModelForCausalLM.from_pretrained(tinyllama_path))
+
+        self.query_size = 2048
+
+        # compatibility with PyTorch/hf types
+        torch.uint64 = torch.int64
+        torch.uint32 = torch.int32
+        torch.uint16 = torch.int16
+
+        import transformers
+        orig_get_init_context = transformers.PreTrainedModel.get_init_context
+        transformers.PreTrainedModel.get_init_context = lambda *args, **kwargs: [
+            c for c in orig_get_init_context(*args, **kwargs)
+            if not (isinstance(c, torch.device) and c.type == 'meta')
+        ]
+
+        
+        hf_model = transformers.AutoModel.from_pretrained(hf_model_id, trust_remote_code=True,local_files_only=True)
+        
+        transformers.PreTrainedModel.get_init_context = orig_get_init_context
+
+        self.sensor_model = freeze_model(hf_model.normwear)
+        self.aggregator = freeze_model(hf_model.normwear.msitf_aggregator)
+        print(f"NormWear and MSiTF loaded from Hugging Face repo: {hf_model_id}")
+
+        # loss
+        loss_l1 = nn.L1Loss()
+        loss_cos = nn.CosineEmbeddingLoss()
+        self.lambda_temp = nn.Parameter(torch.ones(1)*42, requires_grad=True)
+        self.loss_f = lambda x, y: torch.sum(torch.nan_to_num(torch.stack([
+            2*loss_l1(x, y),
+            loss_cos(x, y, torch.ones(len(y)).to(x.device)),
+        ])))
+
+    def signal_encode(self, x, query, sampling_rate=65):
+        # x: [bn, nvar, L]
+        device = x.device
+
+        # sensor encoding
+        spec = self.sensor_model.calc_cwt(x, device=device).float()
+        sensor_out = self.sensor_model.get_signal_embedding(spec, hidden_out=False, device=device) # bn, nvar, P, E
+
+        if query.shape[0] == 1: # if single question for all samples in input batch
+            query = query.expand(sensor_out.shape[0], query.shape[1]) # (bn, 2048)
+        
+        # aggregate
+        bn, nvar, P, E  = sensor_out.shape
+
+        query = query.unsqueeze(1).expand(bn, nvar*P, query.shape[1]) # (bn, nvar, 2048)
+
+        # per channel aggregate
+        ch_aggregate_out = self.aggregator(
+            sensor_out, 
+            query,
+            device=device,
+            rel_only=self.rel_only,
+            use_query=self.use_query
+        ) # bn*nvar, E
+
+        return ch_aggregate_out
