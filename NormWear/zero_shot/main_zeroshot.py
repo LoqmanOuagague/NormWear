@@ -132,7 +132,7 @@ def main(args):
     if global_rank == 0 and args.log_dir is not None:
         log_dir = os.path.join(args.log_dir, args.remark)
         os.makedirs(log_dir,exist_ok=True)
-        run_number = get_next_run_number(log_dir, resume=args.resume)
+        run_number = get_next_run_number(log_dir)
         log_run_dir = os.path.join(log_dir, f'run_{run_number}')
         os.makedirs(log_run_dir, exist_ok=True)
         log_writer = SummaryWriter(log_dir=log_run_dir)
@@ -186,7 +186,7 @@ def main(args):
     #         print(f"Warning: Parameter {name} has requires_grad=False")
     # print("###############Finish checking grad################")
     ########################################
-    print(model.module.aggregator)
+    #print(model.modules.aggregator)
 
     print(f"Start training for {args.epochs} epochs")
     start_time = time.time()
@@ -239,3 +239,4 @@ if __name__ == '__main__':
 
 # main new
 # torchrun --nproc_per_node=4 -m src.zero_shot.main_zeroshot --remark normwear_msitf_clean --blr 1e-3 --weight_decay 1e-4 --epochs 50 --clip_grad 1.0 --save_every_epoch 5 --batch_size 64 --accum_iter 1
+# python3 -m NormWear.zero_shot.main_zeroshot --batch_size 32 --epochs 40 --save_every_epoch 5 --remark normwear_msitf_clean --data_path NormWear/data/wearable_pretrain/
