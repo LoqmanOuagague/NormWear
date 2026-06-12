@@ -24,9 +24,8 @@
 
 # BEGIN JOB
 
-# Load the necessary modules (e.g., Python, CUDA, etc.)
+# Load the necessary modules 
 module purge # Clear all loaded modules to avoid conflicts
-module load python/3.13.4
 module load cuda/12.8.0_570.86.10
 
 cd "CHANGE_ME" # Change to the directory where your to the directory where your this script is located or where your project is located
@@ -34,5 +33,5 @@ cd "CHANGE_ME" # Change to the directory where your to the directory where your 
 # Activate your virtual environment that is already set up with the required dependencies for your project as shown in the README file
 source .venv/bin/activate
 
-# Run your Python script
+# Run your Python script (see the README file for the exact command to run your script, make sure to replace the dataset name and number of runs with the appropriate values)
 CUDA_VISIBLE_DEVICES=0 python3 -m NormWear.zero_shot.zero_shot_inference normwear --dataset wesad 
