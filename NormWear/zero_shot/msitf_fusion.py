@@ -272,9 +272,9 @@ class NormWearZeroShot(nn.Module):
 
         # aggregate loss
         self.loss_f = lambda x, y: torch.sum(torch.nan_to_num(torch.stack([
-            2*loss_l1(x, y),
-            loss_cos(x, y, torch.ones(len(y)).to(x.device)),
-            # ctr_loss(x, y)
+            #2*loss_l1(x, y),
+            #loss_cos(x, y, torch.ones(len(y)).to(x.device)),
+            ctr_loss(x, y)
         ])))
 
     def txt_encode(self, sentences):
