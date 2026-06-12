@@ -54,10 +54,10 @@ def get_args_parser():
     
 
     # Optimizer parameters
-    parser.add_argument('--weight_decay', type=float, default=1e-4,
-                        help='weight decay (default: 0.05)')
+    parser.add_argument('--weight_decay', type=float, default=5e-6,
+                        help='weight decay (default:5e-6)')
 
-    parser.add_argument('--lr', type=float, default=None, metavar='LR',
+    parser.add_argument('--lr', type=float, default=1e-3, metavar='LR',
                         help='learning rate (absolute lr)')
     parser.add_argument('--blr', type=float, default=1e-3, metavar='LR',
                         help='base learning rate: absolute_lr = base_lr * total_batch_size / 256')
@@ -72,7 +72,7 @@ def get_args_parser():
     # Dataset parameters
     parser.add_argument('--data_path', default='../data/wearable_zeroshot_pretrain', type=str,
                         help='dataset path')
-    parser.add_argument('--output_dir', default="../data/audio_results", type=str)
+    parser.add_argument('--output_dir', default="../output", type=str)
     parser.add_argument('--log_dir', default='../data/audio_results/log',
                         help='path where to tensorboard log')
     parser.add_argument('--device', default='cuda',
@@ -229,9 +229,9 @@ def main(args):
 if __name__ == '__main__':
     args = get_args_parser()
     args = args.parse_args()
-    if args.output_dir:
-        args.output_dir = os.path.join(args.output_dir, args.remark)
-        Path(args.output_dir).mkdir(parents=True, exist_ok=True)
+    #if args.output_dir:
+        #args.output_dir = os.path.join(args.output_dir, args.remark)
+        #Path(args.output_dir).mkdir(parents=True, exist_ok=True)
     main(args)
 
 # python3 -m src.zero_shot.main_zeroshot --remark zs_test --batch_size 4
